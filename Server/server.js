@@ -5,9 +5,8 @@ const cors = require("cors");
 const socketIo = require('socket.io');
 require('dotenv').config();
 
-
 const connectDB = require('./models/database');
-
+const { router, io } = require('./routes/auth');
 
 const app = express();
 app.use(cors());
@@ -16,29 +15,27 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.json());
 
-const server = http.createServer(app);
-const io = socketIo(server);
-
 connectDB();
 
-const authRoutes = require('./routes/auth');
 app.use('/auth', authRoutes);
 
-/*
+const server = http.createServer(app);
+io.attach(server);
+
 io.on('connection', (socket) => {
-    console.log('User connected:', socket.id);
-  
+    console.log('A user connected:', socket.id);
+    // Additional socket.io logic can be added here
     socket.on('disconnect', () => {
       console.log('User disconnected:', socket.id);
     });
-  
-    // Example event for handling incoming messages
-    socket.on('sendMessage', (data) => {
-      // Handle the incoming message (store in MongoDB, broadcast to other clients, etc.)
-      console.log('Received message:', data);
-      io.emit('newMessage', data); // Broadcast the message to all connected clients
-    });
   });
-*/
+  
+  // Error handling middleware
+  app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Internal Server Error');
+  });
+
+
 app.listen(process.env.PORT);
 

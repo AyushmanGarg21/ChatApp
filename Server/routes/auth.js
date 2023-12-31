@@ -4,7 +4,9 @@ const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const axios = require('axios');
 const OpenAI = require('openai');
+const socketIo = require('socket.io');
 
+const io = socketIo();
 
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
@@ -16,6 +18,7 @@ router.post('/login', async (req, res) => {
     if (!user) {
       const hashedPassword = await bcrypt.hash(password, 10);
       user = await User.create({ email, password: hashedPassword });
+      io.emit('newUser', user);
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -44,6 +47,8 @@ router.post('/sendMessage', async (req, res) => {
     const response = await generateAIResponse(content);
     user.messages.push({ sender: 'AI', content: response });
     await user.save();
+
+    io.emit('newMessage', { user, message: user.messages[user.messages.length - 1] });
 
     res.status(200).json({ message: 'Chat history updated successfully', user });
   } catch (error) {
@@ -82,5 +87,4 @@ async function generateAIResponse(input) {
     return 'Sorry, an error occurred while generating the AI response.';
   }
 }
-
-module.exports = router;
+module.exports = { router, io };

@@ -79,7 +79,7 @@ const SpeechToText = () => {
         <div className="big-box">
           <div className="inner-box" />
           <div className="big-video">
-            <video className="video" ref={videoRef} autoPlay playsInline />
+            <video className="video" ref={videoRef} autoPlay playsInline/>
           </div>
           <div className="mute-btn button-div">
             <Button onClick={listening ? stopListening : startListening}>

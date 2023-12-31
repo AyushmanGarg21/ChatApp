@@ -2,12 +2,12 @@ import "./loginpage.css";
 import Header from "../../components/Header";
 import LoginForm from "./loginform";
 
-const LoginPage = () => {
+const LoginPage = (props) => {
   return (
     <div className="apple-vision-pro-ui">
       <img className="background-icon" alt="" src="./images/Background.png" />
       <Header/>
-      <LoginForm/>
+      <LoginForm setMessages = {props.setMessages}/>
       <div className="group-parent">
         <img className="group-icon" alt="" src="./images/Group.png" />
         <b className="welcome-to">Welcome to</b>

@@ -1,27 +1,27 @@
 import React, { useState } from "react";
-//import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Link } from "react-router-dom";
 import axios from "axios";
 
-const LoginForm = () => {
+const LoginForm = (props) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loginError, setLoginError] = useState("");
     
-    //const history = useNavigate();
+    const history = useNavigate();
     
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
         const response = await axios.post(
-            "http://localhost:5000/api/auth/login",
+            "http://localhost:5000/auth/login",
             {
             email,
             password,
             }
         );
-        localStorage.setItem("token", response.data.token);
-        //history.push("/dashboard");
+        props.setMessages(response.messages);
+        history.push("/");
         } catch (error) {
         setLoginError(error.response.data.error);
         }
