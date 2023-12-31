@@ -1,49 +1,44 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const http = require('http');
 const cors = require("cors");
-const mongoose = require("mongoose");
+const socketIo = require('socket.io');
 require('dotenv').config();
 
+
+const connectDB = require('./models/database');
+
+
 const app = express();
+app.use(cors());
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.json());
-app.use(cors());
 
-const port = process.env.PORT || 4000;
-const url = process.env.DATABASE_URL;
+const server = http.createServer(app);
+const io = socketIo(server);
 
-mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
+connectDB();
 
-const userSchema = new mongoose.Schema({
-    email: String,
-    password: String,
-    chats: [],
-});
+const authRoutes = require('./routes/auth');
+app.use('/auth', authRoutes);
 
-const User = mongoose.model('User', userSchema);
-
-app.post('/api/users', async function (req, res) {
-    const { email, password } = req.body;
-    const existingUser = await User.findOne({ email });
-    
-    if (existingUser) {
-        res.status(200).json({ chats: existingUser.chats });
-    } else {
-        const newUser = new User({
-            email: email,
-            password: password,
-            chats: [],
-        });
-        newUser.save()
-        .then(result => {
-            res.json(result);
-        })
-.catch(err => {
-            res.json(err);
-        });
-    }
-});
-
-app.listen(port);
+/*
+io.on('connection', (socket) => {
+    console.log('User connected:', socket.id);
+  
+    socket.on('disconnect', () => {
+      console.log('User disconnected:', socket.id);
+    });
+  
+    // Example event for handling incoming messages
+    socket.on('sendMessage', (data) => {
+      // Handle the incoming message (store in MongoDB, broadcast to other clients, etc.)
+      console.log('Received message:', data);
+      io.emit('newMessage', data); // Broadcast the message to all connected clients
+    });
+  });
+*/
+app.listen(process.env.PORT);
 
