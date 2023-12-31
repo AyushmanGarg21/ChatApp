@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "../../styles/SpeechToText.css";
 import Header from "../../components/Header";
 import { Button, Input } from "@mui/base";
@@ -8,6 +8,47 @@ import WhiteBubble from "../../components/whiteBubble";
 
 const SpeechToText = () => {
   const videoRef = useRef(null);
+
+  const [transcript, setTranscript] = useState('');
+  const [listening, setListening] = useState(false);
+  let recognition = null;
+
+  recognition = new window.webkitSpeechRecognition(); // Initialize SpeechRecognition
+  recognition.lang = 'en-US'; // Set language
+  recognition.continuous = true; // Continuous listening
+  const startListening = () => {
+    console.log('Speech recognition Entered...');
+
+    recognition.onstart = () => {
+      setListening(true);
+      console.log('Speech recognition started...');
+    };
+
+    recognition.onresult = (event) => {
+      const currentTranscript = event.results[event.results.length - 1][0].transcript;
+      setTranscript(currentTranscript);
+    };
+
+    recognition.onend = () => {
+      setListening(false);
+      console.log('Speech recognition ended.');
+    };
+
+    recognition.start();
+  };
+
+  const stopListening = () => {
+    console.log(transcript);
+    console.log('Speech recognition Exit...');
+
+    if (recognition) {
+      recognition.stop();
+      setListening(false);
+      console.log('Speech recognition stopped.');
+    }
+    setTranscript("");
+  };
+
 
   useEffect(() => {
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -41,7 +82,7 @@ const SpeechToText = () => {
             <video className="video" ref={videoRef} autoPlay playsInline />
           </div>
           <div className="mute-btn button-div">
-            <Button>
+            <Button onClick={listening ? stopListening : startListening}>
               <img className="mute-button" alt="MuteButton" src=".\images\mike.png" />
             </Button>
             <p>Mute</p>
@@ -60,7 +101,7 @@ const SpeechToText = () => {
         <div className="lower-box">
           <div className="text-box">
             <div className="chats">
-              <BlueBubble text='text'/>
+              <BlueBubble text={transcript}/>
               <WhiteBubble user='user1' text='text'/>
             </div>
             <div className="button-div">

@@ -10,6 +10,33 @@ import WhiteBubble from "../../components/whiteBubble";
 const TextToSpeech = () => {
   const [text, setText] = useState("");
   const [sentText, setSentText] = useState("");
+  const [textToSpeak, setTextToSpeak] = useState("");
+
+  const handleSubmit = () => {
+    setSentText(text);
+    setTextToSpeak(text);
+    setText("");
+  };
+  
+  const speak = () => {
+    if ('speechSynthesis' in window) {
+      const synth = window.speechSynthesis;
+      const utterance = new SpeechSynthesisUtterance(textToSpeak);
+
+      synth.cancel(); // Clear any existing utterances
+
+      synth.speak(utterance);
+    } else {
+      console.error('Speech synthesis not supported');
+    }
+  };
+  
+  useEffect(() => {
+    if (textToSpeak !== '') {
+      speak(); // Start speech synthesis when text is available
+    }
+  }, [textToSpeak]);
+
 
   const videoRef = useRef(null);
 
@@ -28,10 +55,6 @@ const TextToSpeech = () => {
     }
   }, []);
 
-  const handleSubmit = () => {
-    setSentText(text);
-    setText("");
-  };
 
   return (
     <div className="textToSpeech">
