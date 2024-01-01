@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import BlueBubble from "../../components/blueBubble";
 import WhiteBubble from "../../components/whiteBubble";
 
-const SpeechToText = () => {
+const SpeechToText = (props) => {
   const videoRef = useRef(null);
 
   const [transcript, setTranscript] = useState('');

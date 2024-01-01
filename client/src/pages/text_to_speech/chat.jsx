@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState  } from "react";
-import { useCallback } from "react";
 import "../../styles/TextToSpeech.css";
 import Header from "../../components/Header";
 import { Button, Input } from "@mui/base";
@@ -7,10 +6,37 @@ import { Link } from "react-router-dom";
 import BlueBubble from "../../components/blueBubble";
 import WhiteBubble from "../../components/whiteBubble";
 
-const TextToSpeech = () => {
+const TextToSpeech = (props) => {
   const [text, setText] = useState("");
   const [sentText, setSentText] = useState("");
   const [textToSpeak, setTextToSpeak] = useState("");
+  const socket = props.socket;
+
+  
+
+  useEffect(() => {
+    if (socket) {
+      // Listen for initial messages
+      socket.on("initialMessages", (data) => {
+        const messages = data.messages;
+        props.setMessages(messages);
+      });
+
+      // Listen for new messages
+      socket.on("newMessage", (data) => {
+        const user = data.user;
+        const message = data.message;
+        // Handle new messages received from the server
+        console.log("New Message:", message);
+        props.setMessages([...props.messages, message]);
+      });
+      
+      socket.on("error", (error) => {
+        console.error("Socket error:", error);
+      });
+    }
+  }, [socket, props]);
+
 
   const handleSubmit = () => {
     setSentText(text);
@@ -22,9 +48,7 @@ const TextToSpeech = () => {
     if ('speechSynthesis' in window) {
       const synth = window.speechSynthesis;
       const utterance = new SpeechSynthesisUtterance(textToSpeak);
-
       synth.cancel(); // Clear any existing utterances
-
       synth.speak(utterance);
     } else {
       console.error('Speech synthesis not supported');
@@ -71,8 +95,9 @@ const TextToSpeech = () => {
         <div className="big-box">
           <div className="inner-box" />
           <div className="chats">
-            <BlueBubble text={sentText} />
-            <WhiteBubble user="User1" text="lorem34" />
+          {props.messages.map((message) => (
+             message.sender === 'AI'? <WhiteBubble user={"AI"} text={message.content}/>:<BlueBubble text={message.content}/>
+          ))}
           </div>
           <div className="text-input">
             <div className="text-area">

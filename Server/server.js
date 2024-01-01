@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const http = require('http');
 const cors = require("cors");
+const User = require('./models/User');
 const socketIo = require('socket.io');
 require('dotenv').config();
 
@@ -17,25 +18,45 @@ app.use(express.json());
 
 connectDB();
 
-app.use('/auth', authRoutes);
+app.use('/auth', router);
 
 const server = http.createServer(app);
-io.attach(server);
-
-io.on('connection', (socket) => {
+const socketIoServer = socketIo(server,{
+  cors: {
+    origin: "http://localhost:3000",
+    credentials: true
+  }
+});
+let activeSockets = [];
+socketIoServer.on('connection', (socket) => {
     console.log('A user connected:', socket.id);
-    // Additional socket.io logic can be added here
-    socket.on('disconnect', () => {
-      console.log('User disconnected:', socket.id);
+    activeSockets.push(socket.id);
+    socket.on('userLoggedIn', async ({email}) => {
+        let user = await User.findOne({email});
+        socket.emit('initialMessages', { messages: user.messages });
     });
-  });
-  
-  // Error handling middleware
-  app.use((err, req, res, next) => {
+
+    // Listen for user messages
+    socket.on('sendMessage', (data) => {
+        const { email, content } = data;
+        // Additional logic if needed before saving the message
+
+        // Emit message to AI for processing
+        socketIoServer.emit('processMessage', { email, content });
+    });
+
+    socket.on('disconnect', () => {
+        console.log('User disconnected:', socket.id);
+        activeSockets = activeSockets.filter((id) => id !== socket.id);
+    });
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
     console.error(err.stack);
-    res.status(500).send('Internal Server Error');
-  });
+    res.status(500).send('route error');
+});
 
-
-app.listen(process.env.PORT);
-
+server.listen(process.env.PORT, () => {
+    console.log(`Server is running on port ${process.env.PORT}`);
+});

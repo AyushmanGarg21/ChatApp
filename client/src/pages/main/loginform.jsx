@@ -1,51 +1,61 @@
 import React, { useState } from "react";
-import { useNavigate } from 'react-router-dom';
-import { Link } from "react-router-dom";
-import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import socketIOClient from "socket.io-client";
+
 
 const LoginForm = (props) => {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [loginError, setLoginError] = useState("");
-    
-    const history = useNavigate();
-    
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-        const response = await axios.post(
-            "http://localhost:5000/auth/login",
-            {
-            email,
-            password,
-            }
-        );
-        props.setMessages(response.messages);
-        history.push("/");
-        } catch (error) {
-        setLoginError(error.response.data.error);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // Send a request to the server (you can still use axios for this)
+    fetch("http://localhost:5000/auth/login/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        password,
+      }),
+    })
+      .then((response) => {
+        if (response.status === 200) {
+          const socket = socketIOClient("http://localhost:5000");
+          // Emit the 'userLoggedIn' event to the server
+          socket.emit("userLoggedIn", { email });
+          props.setSocket(socket);
+          navigate('/textToSpeech');
+        } else {
+          console.log(response);
+          alert("Error: " + response.statusText);
         }
-    };
-    
-    return (
-        <div className="rectangle-parent">
-        <div className="frame-child" />
-        <form onSubmit={handleSubmit}>
-        <Link to={!loginError && "/textToSpeech"}>
-        <div className="button">
-          <div className="button-child">
-          <div className="lets-go" onClick={handleSubmit}>Lets Go!!</div>
-          </div>
+      });
+  };
+
+  return (
+    <div className="rectangle-parent">
+      <div className="frame-child" />
+      <form onSubmit={handleSubmit}>
+      <div className="button">
+            <div className="button-child">
+              <div className="lets-go" onClick={handleSubmit}>
+                Lets Go!!
+              </div>
+            </div>
         </div>
-        </Link>
         <b className="signup-login">Signup / Login</b>
         <div className="frame-parent">
           <div className="frame-group">
             <div className="your-email-id-wrapper">
               <div className="your-email-id">Your Email id</div>
             </div>
-            <input className="frame-item"
-              id = "email-id"
+            <input
+              className="frame-item"
+              id="email-id"
               type="text"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -57,19 +67,18 @@ const LoginForm = (props) => {
               <div className="your-email-id">Password</div>
             </div>
             <input
-                id="password"
-                type="password"
-                className="frame-item"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
+              id="password"
+              type="password"
+              className="frame-item"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
             />
           </div>
-          {loginError && <p className="error">{loginError}</p>}
         </div>
-        </form>
-      </div>
-    );
-    };
+      </form>
+    </div>
+  );
+};
 
-    export default LoginForm;
+export default LoginForm;
