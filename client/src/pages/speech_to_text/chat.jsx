@@ -2,80 +2,56 @@ import React, { useEffect, useRef, useState } from "react";
 import "../../styles/SpeechToText.css";
 import Header from "../../components/Header";
 import { Button, Input } from "@mui/base";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ChatBox from "../../components/chatbox";
 
 const SpeechToText = (props) => {
   const videoRef = useRef(null);
   const socket = props.socket;
-
+  const navigate = useNavigate();
   const [transcript, setTranscript] = useState('');
   const [listening, setListening] = useState(false);
-  let recognition = null;
-
-  recognition = new window.webkitSpeechRecognition(); // Initialize SpeechRecognition
-  recognition.lang = 'en-US'; // Set language
-  recognition.continuous = false; // Continuous listening
   
-  const startListening = () => {
-    console.log('Speech recognition Entered...');
-
-    recognition.onstart = () => {
-      //setListening(true);
-      console.log('Speech recognition started...');
-    };
-    
-    recognition.onresult = (event) => {
-      const currentTranscript = event.results[event.results.length - 1][0].transcript;
-      setTranscript(currentTranscript);
-      console.log(transcript);
-    };
-    recognition.onend = () => {
-      //setListening(false);
-      console.log('Speech recognition ended.');
-      if (listening) {
-        startListening(); // Restart the recognition if still in listening mode
-      }
-    };
-    recognition.start();
-  };
-
   useEffect(() => {
     if (transcript) {
       socket.emit("sendMessage", {email: props.user, content: transcript})
       const newList = [...props.messages, { sender: "USER", content: transcript }];
-      props.messages(newList);
+      props.setMessages(newList);
     }
   }, [transcript]);
+
+  useEffect(() => {
+    if (socket===null) {
+      navigate("/");
+    }
+  }, []);
 
   socket.on("newMessage", (data) => {
     const messages = data.messages;
     props.setMessages(messages);
-    //setTextToSpeak(messages[messages.length-1].content);
   });
 
+  const recognition = new window.webkitSpeechRecognition(); // SpeechRecognition API
+  recognition.continous = true;
+  recognition.onresult = (event) => {
+    console.log("Start recognition")
+    const last = event.results.length - 1;
+    const text = event.results[last][0].transcript;
+    setTranscript(text);
+    console.log(text);
+  };
+
+  const startListening = () => {
+    console.log("startListen")
+    recognition.start();
+    setListening(true);
+  };
+
   const stopListening = () => {
-    console.log(transcript);
-    console.log('Speech recognition Exit...');
-
-    if (recognition) {
-      recognition.stop();
-      //setListening(false);
-      console.log('Speech recognition stopped.');
-    }
-    setTranscript("");
+    console.log("stopListen")
+    recognition.stop();
+    setListening(false);
   };
-
-  const handleMike = () => {
-    if (listening) {
-      stopListening();
-      setListening(false);
-    } else {
-      startListening();
-      setListening(true);
-    }
-  };
-
 
   useEffect(() => {
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -121,10 +97,10 @@ const SpeechToText = (props) => {
             <video className="video" ref={videoRef} autoPlay playsInline/>
           </div>
           <div className="mute-btn button-div">
-            <Button onClick={handleMike}>
+            <Button onClick={listening ? stopListening : startListening}>
               <img className="mute-button" alt="MuteButton" src=".\images\mike.png" />
             </Button>
-            <p>Mute</p>
+            <p>{listening ? "Listening" : "Mute"}</p>
           </div>
           <div className="button-div">
             <div className="volume ">

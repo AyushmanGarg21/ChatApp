@@ -65,14 +65,14 @@ socketIoServer.on('connection', (socket) => {
               messages: [
                   {
                       "role": "system",
-                      "content": "You will be provided with a block of text, and your task is to generate a human-like answer or reply for it."
+                      "content": "You will be provided with a block of text, and your task is to generate a human-like answer or reply for it within 50 words."
                   },
                   {
                       "role": "user",
                       "content": input
                   }
               ],
-              max_tokens: 64,
+              max_tokens: 50,
           });
           return response.choices[0].message.content;
       } catch (error) {

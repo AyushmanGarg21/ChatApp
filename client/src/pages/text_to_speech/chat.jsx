@@ -33,7 +33,6 @@ const TextToSpeech = (props) => {
   const handleSubmit = () => {
     props.setMessages([...props.messages, {sender:"User",content:text}]);
     if (socket) { 
-      console.log(text)
       socket.emit("sendMessage", {
         email: props.user,
         content: text
