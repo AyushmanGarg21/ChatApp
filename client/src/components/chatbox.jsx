@@ -4,8 +4,8 @@ import WhiteBubble from "./whiteBubble";
 const ChatBox = ({messages}) => {
     return (
         <div>
-            {messages.map((message) => (
-                message.sender === 'AI'? <WhiteBubble user={"AI"} text={message.content}/>:<BlueBubble text={message.content}/>
+            {messages.map((message,index) => (
+                message.sender === 'AI'? <WhiteBubble key={index} user={"AI"} text={message.content}/>:<BlueBubble key={index} text={message.content}/>
             ))}
         </div>
     );

@@ -10,9 +10,8 @@ const LoginForm = (props) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // Send a request to the server (you can still use axios for this)
-    fetch("http://localhost:5000/auth/login/", {
+    //https://chatapp-server-scrs.onrender.com
+    fetch("https://chatapp-server-scrs.onrender.com/auth/login/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -24,7 +23,7 @@ const LoginForm = (props) => {
     })
       .then((response) => {
         if (response.status === 200) {
-          const socket = socketIOClient("http://localhost:5000",{
+          const socket = socketIOClient("https://chatapp-server-scrs.onrender.com",{
             path: "/api/socket.io"
           });
           // Emit the 'userLoggedIn' event to the server
@@ -34,7 +33,11 @@ const LoginForm = (props) => {
           navigate('/textToSpeech');
         } else {
           console.log(response);
-          alert("Error: " + response.statusText);
+          if(response.status === 401){
+            alert("Invalid password")
+          }else{
+            alert("Error: " + response.statusText);
+          }
         }
       });
   };

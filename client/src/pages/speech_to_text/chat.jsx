@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import "../../styles/SpeechToText.css";
 import Header from "../../components/Header";
-import { Button, Input } from "@mui/base";
+import { Button } from "@mui/base";
 import { Link, useNavigate } from "react-router-dom";
 import ChatBox from "../../components/chatbox";
 
@@ -13,7 +13,7 @@ const SpeechToText = (props) => {
   const [listening, setListening] = useState(false);
   
   useEffect(() => {
-    if (transcript) {
+    if (transcript && socket) {
       socket.emit("sendMessage", {email: props.user, content: transcript})
       const newList = [...props.messages, { sender: "USER", content: transcript }];
       props.setMessages(newList);
@@ -21,15 +21,10 @@ const SpeechToText = (props) => {
   }, [transcript]);
 
   useEffect(() => {
-    if (socket===null) {
+    if (!socket) {
       navigate("/");
     }
   }, []);
-
-  socket.on("newMessage", (data) => {
-    const messages = data.messages;
-    props.setMessages(messages);
-  });
 
   const recognition = new window.webkitSpeechRecognition(); // SpeechRecognition API
   recognition.continous = true;
@@ -85,7 +80,7 @@ const SpeechToText = (props) => {
       <video
         autoPlay
         loop
-        muted="false"
+        muted={true}
         className="background-icon"
         alt="BackgroundImage"
         src=".\images\back-video.mp4"
@@ -108,7 +103,7 @@ const SpeechToText = (props) => {
                 <div className="fill-meter"></div>
               </div>
 
-              <img className="volume-icon" alt="VolumeIcon" src="" />
+              <img className="volume-icon" alt="VolumeIcon" src=".\images\volume.png" />
             </div>
             <p>Volume</p>
           </div>

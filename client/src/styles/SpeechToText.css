@@ -1,8 +1,8 @@
 .background-icon {
     position: absolute;
     left: 0;
-    width: 100em;
-    height: 50em;
+    width: 1920px;
+    height: 955px;
     z-index: -1;
     overflow-x: hidden;
   }
@@ -39,11 +39,8 @@
   .big-video {
     width: 33rem;
     height: 20rem;
-    flex-shrink: 0;
     border-radius: 24px;
     border: 5px solid var(--Pure-White, #fff);
-    background-size: cover;
-    background-position: center;
     margin-right: 2rem;
   }
 
@@ -55,20 +52,15 @@
   }
   
   .mute-button {
-    background: rgba(255, 255, 255, 0.1);
-    border: none;
     margin: 0 1rem;
-    height: 7rem;
+    height: 6rem;
   }
   
   .volume {
-    width: 3.6rem;
     height: 7.5rem;
-    flex-shrink: 0;
     border-radius: 3.75px;
     background: rgba(0, 0, 0, 0.73);
     margin: 0 1rem;
-    /* margin-bottom:0 ; */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -76,8 +68,6 @@
   }
   
   .volume-icon {
-    height: 2rem;
-    width: 2rem;
     margin: 0.7rem;
     margin-top: 0;
   }
@@ -124,47 +114,22 @@
       0px 0.761px 6.087px 0px rgba(255, 255, 255, 0.35) inset;
     backdrop-filter: blur(74.56938171386719px);
     -webkit-backdrop-filter: blur(74.56938171386719px);
-    background: rgba(255, 255, 255, 0.1);
     margin-left: 2rem;
-    padding: 1rem;
     border-radius: 33.345px;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-direction: column;
   }
   
   .chats{
-      width: 30rem;
     height: 100%;
-    overflow-y: auto;
     overflow-x: hidden;
-    scroll-behavior: smooth;
-    scrollbar-base-color: transparent;
   }
   
-  .outer-circle{
-      position: fixed;
-    background: none;
-    border: none;
-    margin: 0 1rem;
-    height: 7rem;
-  }
-  
-  .inner-circle{
-      position: fixed;
-  
-    background: none;
-    border: none;
-    margin: 0 1rem;
-    height: 5rem;
-  }
   
   .pause-btn{
     position: fixed;
-      background: none;
-      border: none;
-      margin: 0 1rem;
-      height: 3rem;
+      margin-bottom: 2rem;
+      height: 6rem;
       z-index: 1;
   }

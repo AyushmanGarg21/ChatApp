@@ -2,20 +2,19 @@ import React, { useEffect, useRef, useState  } from "react";
 import "../../styles/TextToSpeech.css";
 import Header from "../../components/Header";
 import { Button, Input } from "@mui/base";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ChatBox from "../../components/chatbox";
 
 const TextToSpeech = (props) => {
   const [text, setText] = useState("");
   const [textToSpeak, setTextToSpeak] = useState("");
   const socket = props.socket;
+  const navigate = useNavigate();
+
 
   if (socket) {
-    // Listen for new messages
     socket.on("initialMessages", (data) => {
       const messages = data.messages;
-      // Handle initial messages received from the server
-      console.log("Initial Messages:", messages);
       props.setMessages(messages);
     });
 
@@ -40,21 +39,23 @@ const TextToSpeech = (props) => {
     }
     setText("");
   };
-  
-  const speak = () => {
-    if ('speechSynthesis' in window) {
-      const synth = window.speechSynthesis;
-      const utterance = new SpeechSynthesisUtterance(textToSpeak);
-      synth.cancel(); // Clear any existing utterances
-      synth.speak(utterance);
-    } else {
-      console.error('Speech synthesis not supported');
+
+  useEffect(() => {
+    if (!socket) {
+      navigate("/");
     }
-  };
+  }, []);
   
   useEffect(() => {
     if (textToSpeak !== '') {
-      speak(); // Start speech synthesis when text is available
+      if ('speechSynthesis' in window) {
+        const synth = window.speechSynthesis;
+        const utterance = new SpeechSynthesisUtterance(textToSpeak);
+        synth.cancel(); // Clear any existing utterances
+        synth.speak(utterance);
+      } else {
+        console.error('Speech synthesis not supported');
+      }
     }
   }, [textToSpeak]);
 
@@ -94,7 +95,7 @@ const TextToSpeech = (props) => {
       <video
         autoPlay
         loop
-        muted="false"
+        muted={true}
         className="background-icon"
         alt="BackgroundImage"
         src=".\images\back-video.mp4"
@@ -136,7 +137,7 @@ const TextToSpeech = (props) => {
                   <img
                     className="mute-button"
                     alt="ChatButton"
-                    src=".\images\video logo.png"
+                    src=".\images\videologo.png"
                   />
                 </Button>
               </Link>
@@ -145,13 +146,7 @@ const TextToSpeech = (props) => {
           </div>
           <div className="pause-button-div">
             <Button className="pause-box">
-              <img
-                className="outer-circle"
-                alt="ChatButton"
-                src=".\images\Pause.png"
-              />
-              <img className="inner-circle" src=".\images\Pause.png" alt="" />
-              <img className="pause-btn" src="./images/Pause.png" alt="" />
+              <img className="pause-btn" src=".\images\Pause.png" alt="" />
               <p>Pause</p>
             </Button>
           </div>

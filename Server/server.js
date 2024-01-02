@@ -12,7 +12,7 @@ const openai = new OpenAI({
 });
 
 const connectDB = require('./models/database');
-const { router, io } = require('./routes/auth');
+const { router } = require('./routes/auth');
 
 const app = express();
 app.use(cors());
@@ -29,7 +29,7 @@ const server = http.createServer(app);
 const socketIoServer = socketIo(server,{
   path: "/api/socket.io",
   cors: {
-    origin: "http://localhost:3000",
+    origin: true,
     credentials: true
   }
 });
@@ -42,14 +42,12 @@ socketIoServer.on('connection', (socket) => {
         socket.emit('initialMessages', { messages: user.messages });
     });
 
-    // Listen for user messages
     socket.on('sendMessage', async (data) => {
         const { email, content } = data;
         try {
           const response = await generateAIResponse(content);
           const user = await User.findOne({ email });
           user.messages.push({ sender: 'USER', content : content });
-          // Update user's messages with AI response
           user.messages.push({ sender: 'AI', content: response });
           await user.save();
           socket.emit('newMessage', {messages: user.messages });
@@ -87,7 +85,6 @@ socketIoServer.on('connection', (socket) => {
     });
 });
 
-// Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).send('route error');

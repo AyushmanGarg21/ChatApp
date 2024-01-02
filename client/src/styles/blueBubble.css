@@ -1,15 +1,12 @@
 .sentTextBubble {
-    display: flex;
-    flex-direction: column;
     left: 40%;
-    margin-bottom: 1rem;
     position: relative;
   }
   
   p {
     margin-block-start: 0;
     margin-block-end: 0.2rem;
-    margin-left: 1rem;
+    
   }
   
   .sentTextBubble .message-box {
@@ -19,7 +16,6 @@
   }
   
   .sentTextBubble .message {
-    display: flex;
     width: 55%;
     height: fit-content;
     padding: 1rem;
@@ -28,7 +24,6 @@
     border: 0.1rem solid #2e9dfb;
     background: #2e9dfb;
     border-radius: 20px;
-    z-index: 1;
   }
   
   .sentTextBubble .stroke {
