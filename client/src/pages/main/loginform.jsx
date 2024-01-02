@@ -24,10 +24,13 @@ const LoginForm = (props) => {
     })
       .then((response) => {
         if (response.status === 200) {
-          const socket = socketIOClient("http://localhost:5000");
+          const socket = socketIOClient("http://localhost:5000",{
+            path: "/api/socket.io"
+          });
           // Emit the 'userLoggedIn' event to the server
-          socket.emit("userLoggedIn", { email });
           props.setSocket(socket);
+          props.setUser(email);
+          socket.emit("userLoggedIn", { email });
           navigate('/textToSpeech');
         } else {
           console.log(response);

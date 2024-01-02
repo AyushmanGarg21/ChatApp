@@ -139,6 +139,8 @@
     height: 100%;
     overflow-y: auto;
     overflow-x: hidden;
+    scroll-behavior: smooth;
+    scrollbar-base-color: transparent;
   }
   
   .outer-circle{

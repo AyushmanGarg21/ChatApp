@@ -3,44 +3,42 @@ import "../../styles/TextToSpeech.css";
 import Header from "../../components/Header";
 import { Button, Input } from "@mui/base";
 import { Link } from "react-router-dom";
-import BlueBubble from "../../components/blueBubble";
-import WhiteBubble from "../../components/whiteBubble";
+import ChatBox from "../../components/chatbox";
 
 const TextToSpeech = (props) => {
   const [text, setText] = useState("");
-  const [sentText, setSentText] = useState("");
   const [textToSpeak, setTextToSpeak] = useState("");
   const socket = props.socket;
 
-  
+  if (socket) {
+    // Listen for new messages
+    socket.on("initialMessages", (data) => {
+      const messages = data.messages;
+      // Handle initial messages received from the server
+      console.log("Initial Messages:", messages);
+      props.setMessages(messages);
+    });
 
-  useEffect(() => {
-    if (socket) {
-      // Listen for initial messages
-      socket.on("initialMessages", (data) => {
-        const messages = data.messages;
-        props.setMessages(messages);
-      });
-
-      // Listen for new messages
-      socket.on("newMessage", (data) => {
-        const user = data.user;
-        const message = data.message;
-        // Handle new messages received from the server
-        console.log("New Message:", message);
-        props.setMessages([...props.messages, message]);
-      });
-      
-      socket.on("error", (error) => {
-        console.error("Socket error:", error);
-      });
-    }
-  }, [socket, props]);
-
+    socket.on("newMessage", (data) => {
+      const messages = data.messages;
+      props.setMessages(messages);
+      setTextToSpeak(messages[messages.length-1].content);
+    });
+    
+    socket.on("error", (error) => {
+      console.error("Socket error:", error);
+    });
+  }
 
   const handleSubmit = () => {
-    setSentText(text);
-    setTextToSpeak(text);
+    props.setMessages([...props.messages, {sender:"User",content:text}]);
+    if (socket) { 
+      console.log(text)
+      socket.emit("sendMessage", {
+        email: props.user,
+        content: text
+      });
+    }
     setText("");
   };
   
@@ -79,6 +77,17 @@ const TextToSpeech = (props) => {
     }
   }, []);
 
+  const chatContainerRef = useRef(null);
+  const scrollToBottom = () => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
+    }
+  };
+  useEffect(() => {
+    scrollToBottom();
+  }, [props.messages]);
+
 
   return (
     <div className="textToSpeech">
@@ -94,10 +103,8 @@ const TextToSpeech = (props) => {
       <div className="outer-box">
         <div className="big-box">
           <div className="inner-box" />
-          <div className="chats">
-          {props.messages.map((message) => (
-             message.sender === 'AI'? <WhiteBubble user={"AI"} text={message.content}/>:<BlueBubble text={message.content}/>
-          ))}
+          <div className="chats" ref={chatContainerRef}>
+            <ChatBox messages={props.messages} />
           </div>
           <div className="text-input">
             <div className="text-area">
