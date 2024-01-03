@@ -17,7 +17,7 @@ const ToggleButton = ({setPage}) => {
             <img
               className="mute-button"
               alt="ChatButton"
-              src={setPage?"./images/videologo.png":"./images/chaticon.png"}
+              src={setPage?"./images/Videologo.png":"./images/chaticon.png"}
             />
         </Button>
         {setPage? <p>Video</p> :<p> Chat</p>}
