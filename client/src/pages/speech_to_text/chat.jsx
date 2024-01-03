@@ -1,12 +1,16 @@
 import React, { useEffect, useRef, useState } from "react";
 import "../../styles/SpeechToText.css";
 import Header from "../../components/Header";
-import { Button } from "@mui/base";
-import { Link, useNavigate } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import ChatBox from "../../components/chatbox";
+import Background from "../../components/background";
+import PauseButton from "../../components/pauseButton";
+import Video from "../../components/video";
+import ToggleButton from "../../components/videoToChat";
+import Volume from "./volume";
+import Mic from "./mic";
 
 const SpeechToText = (props) => {
-  const videoRef = useRef(null);
   const socket = props.socket;
   const navigate = useNavigate();
   const [transcript, setTranscript] = useState('');
@@ -17,6 +21,7 @@ const SpeechToText = (props) => {
       socket.emit("sendMessage", {email: props.user, content: transcript})
       const newList = [...props.messages, { sender: "USER", content: transcript }];
       props.setMessages(newList);
+      setListening(false);
     }
   }, [transcript]);
 
@@ -48,21 +53,14 @@ const SpeechToText = (props) => {
     setListening(false);
   };
 
-  useEffect(() => {
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      navigator.mediaDevices
-        .getUserMedia({ video: true })
-        .then((stream) => {
-          if (videoRef.current) {
-            videoRef.current.srcObject = stream;
-          }
-        })
-        .catch((error) => {
-          console.error('Error accessing the camera:', error);
-        });
+  const Handle_listening = () => {
+    if(listening){ 
+      stopListening(); 
     }
-  }, []);
-
+    else{ 
+      startListening(); 
+    }
+  };
   const chatContainerRef = useRef(null);
   const scrollToBottom = () => {
     if (chatContainerRef.current) {
@@ -77,62 +75,24 @@ const SpeechToText = (props) => {
   return (
     <div className="chat">
       <Header />
-      <video
-        autoPlay
-        loop
-        muted={true}
-        className="background-icon"
-        alt="BackgroundImage"
-        src=".\images\back-video.mp4"
-      />
+      <Background />
       <div className="outer-box">
         <div className="big-box">
           <div className="inner-box" />
           <div className="big-video">
-            <video className="video" ref={videoRef} autoPlay playsInline/>
+            <Video/>
           </div>
-          <div className="mute-btn button-div">
-            <Button onClick={listening ? stopListening : startListening}>
-              <img className="mute-button" alt="MuteButton" src=".\images\mike.png" />
-            </Button>
-            <p>{listening ? "Listening" : "Mute"}</p>
-          </div>
-          <div className="button-div">
-            <div className="volume ">
-              <div className="volume-meter">
-                <div className="fill-meter"></div>
-              </div>
-
-              <img className="volume-icon" alt="VolumeIcon" src=".\images\volume.png" />
-            </div>
-            <p>Volume</p>
-          </div>
+          <Mic Handle_listening = {Handle_listening} listening = {listening}/>
+          <Volume/>
         </div>
         <div className="lower-box">
           <div className="text-box">
           <div className="chats" ref={chatContainerRef}>
             <ChatBox messages={props.messages} />
           </div>
-            <div className="button-div">
-              <Link to="/textToSpeech">
-                <Button className="chat-button">
-                  <img
-                    className="mute-button"
-                    alt="ChatButton"
-                    src=".\images\chaticon.png"
-                  />
-                </Button>
-              </Link>
-              <p>Chat</p>
-            </div>
+            <ToggleButton setpage={false}/>
           </div>
-          <div className="pause-button-div">
-            <Button className="pause-box">
-              
-              <img className="pause-btn" src=".\images\pause.png" alt="" />
-          <p>Pause</p>
-            </Button>
-          </div>
+         <PauseButton/>
         </div>
       </div>
     </div>

@@ -1,16 +1,20 @@
 import React, { useEffect, useRef, useState  } from "react";
 import "../../styles/TextToSpeech.css";
 import Header from "../../components/Header";
-import { Button, Input } from "@mui/base";
-import { Link, useNavigate } from "react-router-dom";
+import { Button ,Input } from "@mui/base";
+import { useNavigate } from "react-router-dom";
 import ChatBox from "../../components/chatbox";
+import Background from "../../components/background";
+import PauseButton from "../../components/pauseButton";
+import Video from "../../components/video";
+import ToggleButton from "../../components/videoToChat";
+import SpeakText from "./speakText";
 
 const TextToSpeech = (props) => {
   const [text, setText] = useState("");
   const [textToSpeak, setTextToSpeak] = useState("");
   const socket = props.socket;
   const navigate = useNavigate();
-
 
   if (socket) {
     socket.on("initialMessages", (data) => {
@@ -40,43 +44,6 @@ const TextToSpeech = (props) => {
     setText("");
   };
 
-  useEffect(() => {
-    if (!socket) {
-      navigate("/");
-    }
-  }, []);
-  
-  useEffect(() => {
-    if (textToSpeak !== '') {
-      if ('speechSynthesis' in window) {
-        const synth = window.speechSynthesis;
-        const utterance = new SpeechSynthesisUtterance(textToSpeak);
-        synth.cancel(); // Clear any existing utterances
-        synth.speak(utterance);
-      } else {
-        console.error('Speech synthesis not supported');
-      }
-    }
-  }, [textToSpeak]);
-
-
-  const videoRef = useRef(null);
-
-  useEffect(() => {
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      navigator.mediaDevices
-        .getUserMedia({ video: true })
-        .then((stream) => {
-          if (videoRef.current) {
-            videoRef.current.srcObject = stream;
-          }
-        })
-        .catch((error) => {
-          console.error('Error accessing the camera:', error);
-        });
-    }
-  }, []);
-
   const chatContainerRef = useRef(null);
   const scrollToBottom = () => {
     if (chatContainerRef.current) {
@@ -84,23 +51,28 @@ const TextToSpeech = (props) => {
         chatContainerRef.current.scrollHeight;
     }
   };
+  
+  useEffect(() => {
+    SpeakText(textToSpeak);
+  }, [textToSpeak]);
+
   useEffect(() => {
     scrollToBottom();
   }, [props.messages]);
+
+  useEffect(() => {
+    if (!socket) {
+      navigate("/");
+    }
+  }, [socket,navigate]);
 
 
   return (
     <div className="textToSpeech">
       <Header />
-      <video
-        autoPlay
-        loop
-        muted={true}
-        className="background-icon"
-        alt="BackgroundImage"
-        src=".\images\back-video.mp4"
-      />
+      <Background />
       <div className="outer-box">
+
         <div className="big-box">
           <div className="inner-box" />
           <div className="chats" ref={chatContainerRef}>
@@ -128,28 +100,10 @@ const TextToSpeech = (props) => {
         </div>
         <div className="lower-box">
           <div className="text-box">
-            <div className="small-video">
-            <video className="video" ref={videoRef} autoPlay playsInline />
-            </div>
-            <div className="button-div">
-              <Link to="/speechToText">
-                <Button className="chat-button">
-                  <img
-                    className="mute-button"
-                    alt="ChatButton"
-                    src=".\images\videologo.png"
-                  />
-                </Button>
-              </Link>
-              <p>Video</p>
-            </div>
+            <div className="small-video"><Video/></div>
+            <ToggleButton setPage = {true}/>
           </div>
-          <div className="pause-button-div">
-            <Button className="pause-box">
-              <img className="pause-btn" src=".\images\Pause.png" alt="" />
-              <p>Pause</p>
-            </Button>
-          </div>
+          <PauseButton/>
         </div>
       </div>
     </div>

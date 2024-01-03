@@ -1,9 +1,29 @@
-
-.background-icon{
-  position: absolute;
+.login-page {
+  position: relative;
   width: 1920px;
   height: 955px;
+  overflow: hidden;
+  text-align: left;
+  font-size: 20px;
+  color: var(--color-white);
+  font-family: var(--font-poppins);
+}
+
+.background-icon{
   object-fit: cover;
+}
+
+.rectangle-parent {
+  position: absolute;
+  top: calc(50% - 312px);
+  left: calc(50% + 168px);
+  border-radius: 33.34px;
+  box-shadow: var(--vision);
+  backdrop-filter: blur(149.14px);
+  -webkit-backdrop-filter: blur(149.14px);
+  width: 700px;
+  height: 648px;
+  overflow: hidden;
 }
 
 .button-child,
@@ -87,18 +107,7 @@
   gap: 16px;
   font-size: var(--font-size-base);
 }
-.rectangle-parent {
-  position: absolute;
-  top: calc(50% - 312px);
-  left: calc(50% + 168px);
-  border-radius: 33.34px;
-  box-shadow: var(--vision);
-  backdrop-filter: blur(149.14px);
-  -webkit-backdrop-filter: blur(149.14px);
-  width: 700px;
-  height: 648px;
-  overflow: hidden;
-}
+
 .group-icon {
   width: 113px;
   height: 173.71px;
@@ -119,16 +128,7 @@
   text-align: center;
   font-size: var(--font-size-29xl);
 }
-.apple-vision-pro-ui {
-  position: relative;
-  width: 100%;
-  height: 955px;
-  overflow: hidden;
-  text-align: left;
-  font-size: 20px;
-  color: var(--color-white);
-  font-family: var(--font-poppins);
-}
+
 
 Button{
   background-color: transparent;

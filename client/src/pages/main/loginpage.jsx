@@ -1,10 +1,10 @@
-import "./loginpage.css";
+import "../../styles/loginpage.css";
 import Header from "../../components/Header";
 import LoginForm from "./loginform";
 
 const LoginPage = (props) => {
   return (
-    <div className="apple-vision-pro-ui">
+    <div className="login-page">
       <img className="background-icon" alt="" src="./images/Background.png" />
       <Header/>
       <LoginForm setMessages = {props.setMessages} setSocket = {props.setSocket} setUser = {props.setUser}/>

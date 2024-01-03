@@ -26,7 +26,6 @@ const LoginForm = (props) => {
           const socket = socketIOClient("https://chatapp-server-scrs.onrender.com",{
             path: "/api/socket.io"
           });
-          // Emit the 'userLoggedIn' event to the server
           props.setSocket(socket);
           props.setUser(email);
           socket.emit("userLoggedIn", { email });
