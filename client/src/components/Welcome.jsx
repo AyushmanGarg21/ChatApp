@@ -5,11 +5,11 @@ export default function Welcome() {
     const [userName, setUserName] = useState("");
     useEffect(() => {
         async function fetchData() {
-            setUserName(
-                await JSON.parse(
-                    localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)
-                ).username
+            const data = await JSON.parse(
+                localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)
             );
+            if (!data) return;
+            setUserName(data.username);
         }
         fetchData();
     }, []);

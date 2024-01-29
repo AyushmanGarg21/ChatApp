@@ -1,15 +1,35 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 
-export default function Contacts({ contacts, changeChat }) {
+export default function Contacts({ contacts, changeChat, socket}) {
   const [currentUserName, setCurrentUserName] = useState(undefined);
   const [currentUserImage, setCurrentUserImage] = useState(undefined);
   const [currentSelected, setCurrentSelected] = useState(undefined);
+  const [onlineUsers, setOnlineUsers] = useState([]);
+
+  useEffect(() => {
+  function connectSocket() {
+    if (socket) {
+      socket.on("onlineUsers", (users) => {
+        setOnlineUsers(users);
+      });
+    }
+  }
+  connectSocket();
+}, [onlineUsers, socket]);
+
+
+  const setOnlineColor = (id) => {
+      return onlineUsers.includes(id) ? '#7eedb2' : 'red';
+  };
+
+
   useEffect(() => {
     async function fetchData() {
       const data = await JSON.parse(
         localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)
       );
+      if(!data) return;
       setCurrentUserName(data.username);
       setCurrentUserImage(data.avatarImage);
     }
@@ -36,6 +56,7 @@ export default function Contacts({ contacts, changeChat }) {
                   }`}
                   onClick={() => changeCurrentChat(index, contact)}
                 >
+                  <div className="point" style={{ backgroundColor: setOnlineColor(contact._id) }}></div>
                   <div className="avatar">
                     <img
                       src={`data:image/svg+xml;base64,${contact.avatarImage}`}
@@ -111,6 +132,11 @@ const Container = styled.div`
         img {
           height: 3rem;
         }
+      }
+      .point{
+        border-radius: 50%;
+        height: 0.5rem;
+        width: 0.5rem;
       }
       .username {
         h3 {

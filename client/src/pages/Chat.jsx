@@ -61,7 +61,7 @@ useEffect(() => {
     <>
       <Container>
         <div className="container">
-          <Contacts contacts={contacts} changeChat={handleChatChange} />
+          <Contacts contacts={contacts} changeChat={handleChatChange} socket = {io(host)}/>
           {currentChat === undefined ? (
             <Welcome />
           ) : (
