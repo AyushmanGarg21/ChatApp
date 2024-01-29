@@ -37,25 +37,22 @@ const io = socket(server, {
 global.onlineUsers = new Map();
 
 io.on("connection", (socket) => {
-    console.log("a user connected");
-
+    global.chatSocket = socket;
     socket.on("join", (userId) => {
         console.log("user joined", userId);
-        global.onlineUsers.set(userId, socket.id);
+        onlineUsers.set(userId, socket.id);
         console.log(global.onlineUsers);
+    });
+
+    socket.on("sendMessage", ({ to, from, text }) => {
+        console.log(`message sent ${to} ${from} ${text}`);
+        const receiverSocket = onlineUsers.get(to);
+        console.log(receiverSocket);
+        socket.to(receiverSocket).emit("getMessage",text);
     });
 
     socket.on("disconnect", () => {
         console.log("user disconnected");
-    });
-
-    socket.on("sendMessage", ({ senderId, receiverId, text }) => {
-        console.log("message sent");
-        const receiverSocket = global.onlineUsers.get(receiverId);
-        io.to(receiverSocket).emit("getMessage", {
-            senderId,
-            text,
-        });
     });
 });
 
