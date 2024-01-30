@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
+import Logout from "./Logout";
 
 export default function Contacts({ contacts, changeChat, socket}) {
   const [currentUserName, setCurrentUserName] = useState(undefined);
@@ -63,9 +64,7 @@ export default function Contacts({ contacts, changeChat, socket}) {
                       alt=""
                     />
                   </div>
-                  <div className="username">
-                    <h3>{contact.username}</h3>
-                  </div>
+                  <div className="username"><h3>{contact.username}</h3></div>
                 </div>
               );
             })}
@@ -79,6 +78,9 @@ export default function Contacts({ contacts, changeChat, socket}) {
             </div>
             <div className="username">
               <h2>{currentUserName}</h2>
+            </div>
+            <div className="logout">
+              <Logout socket={socket} />
             </div>
           </div>
         </Container>
@@ -180,6 +182,10 @@ const Container = styled.div`
       h2 {
         color: white;
       }
+    }
+    .logout {
+      background-color: #FFB0B0;
+      border-radius: 0.5rem;
     }
     @media screen and (min-width: 480px) and (max-width: 900px) {
       gap: 0.5rem;

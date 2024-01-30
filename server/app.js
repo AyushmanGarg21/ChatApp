@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 const OpenAI = require('openai');
 const authRoutes = require("./routes/auth");
 const messageRoutes = require("./routes/messages");
-
+const Messages = require("./models/messageModel");
 
 require('dotenv').config();
 const app = express();
@@ -52,8 +52,13 @@ io.on("connection", (socket) => {
     });
     socket.on("sendMessage", ({ to, from, text }) => {
         if(to === process.env.AI_ID){
-            generateAIResponse(text).then((response) => {
-                socket.emit("getMessage",response);
+            generateAIResponse(text).then( async (response) => {
+                const data = await Messages.create({
+                    message: { text: response },
+                    users: [to, from],
+                    sender: to,
+                });
+                if(data) socket.emit("getMessage",response);
             });
             return;
         }else{

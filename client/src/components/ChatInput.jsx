@@ -99,11 +99,14 @@ const Container = styled.div`
       width: 90%;
       height: 60%;
       background-color: transparent;
-      color: white;
+      color: #ebe7ff;
       border: none;
       padding-left: 1rem;
       font-size: 1.2rem;
 
+      &::placeholder {
+        color: #ebe7ff77;
+      }
       &::selection {
         background-color: #FFB0B0;
       }
