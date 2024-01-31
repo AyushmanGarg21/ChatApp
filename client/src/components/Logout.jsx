@@ -13,7 +13,7 @@ export default function Logout({socket}) {
     const data = await axios.get(`${logoutRoute}/${id}`);
     if (data.status === 200) {
       localStorage.clear();
-      socket.disconnect();
+      socket.current.disconnect();
       navigate("/login");
     }
   };

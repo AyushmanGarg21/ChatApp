@@ -29,6 +29,7 @@ const server  = app.listen(process.env.PORT, () => {
 });
 
 const io = socket(server, {
+    path: "/api/socket.io",
     cors: {
       origin: true,
       credentials: true,

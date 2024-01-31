@@ -18,7 +18,7 @@ export default function Chat() {
 
   useEffect(() => {
   function connectSocket() {
-    socket.current = io(host);
+    socket.current = io(host ,{path: "/api/socket.io"});
     if (socket.current) {
       socket.current.on("onlineUsers", (users) => {
         setOnlineUsers(users);
@@ -47,7 +47,7 @@ useEffect(() => {
 useEffect(() => {
     async function connectSocket() {
         if (currentUser) {
-            socket.current = io(host);
+            socket.current = io(host ,{path: "/api/socket.io"});
             socket.current.emit("join", currentUser._id);
         }
     }
@@ -76,7 +76,7 @@ useEffect(() => {
     <>
       <Container>
         <div className="container">
-          <Contacts contacts={contacts} changeChat={handleChatChange} socket = {io(host)} onlineUsers={onlineUsers} />
+          <Contacts contacts={contacts} changeChat={handleChatChange} socket = {socket} onlineUsers={onlineUsers} />
           {currentChat === undefined ? (
             <Welcome />
           ) : (
