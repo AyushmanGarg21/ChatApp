@@ -2,22 +2,10 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import Logout from "./Logout";
 
-export default function Contacts({ contacts, changeChat, socket}) {
+export default function Contacts({ contacts, changeChat, socket , onlineUsers}) {
   const [currentUserName, setCurrentUserName] = useState(undefined);
   const [currentUserImage, setCurrentUserImage] = useState(undefined);
   const [currentSelected, setCurrentSelected] = useState(undefined);
-  const [onlineUsers, setOnlineUsers] = useState([]);
-
-  useEffect(() => {
-  function connectSocket() {
-    if (socket) {
-      socket.on("onlineUsers", (users) => {
-        setOnlineUsers(users);
-      });
-    }
-  }
-  connectSocket();
-}, [onlineUsers, socket]);
 
 
   const setOnlineColor = (id) => {
@@ -93,11 +81,9 @@ const Container = styled.div`
   grid-template-rows: 10% 75% 15%;
   overflow: auto;
     &::-webkit-scrollbar {
-      width: 0.2rem;
+      height: 2px;
       &-thumb {
         background-color: #ffffff39;
-        width: 0.1rem;
-        border-radius: 1rem;
       }
     }
   background-color: #FC6736;
@@ -119,6 +105,15 @@ const Container = styled.div`
     flex-direction: column;
     align-items: center;
     gap: 0.5rem;
+    overflow: auto;
+    &::-webkit-scrollbar {
+      width: 0.2rem;
+      &-thumb {
+        background-color: #ffffff39;
+        width: 0.1rem;
+        border-radius: 1rem;
+      }
+    }
     .contact {
       background-color: #ffffff34;
       min-height: 5rem;

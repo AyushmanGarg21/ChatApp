@@ -14,6 +14,21 @@ export default function Chat() {
   const [contacts, setContacts] = useState([]);
   const [currentChat, setCurrentChat] = useState(undefined);
   const [currentUser, setCurrentUser] = useState(undefined);
+  const [onlineUsers, setOnlineUsers] = useState([]);
+
+  useEffect(() => {
+  function connectSocket() {
+    socket.current = io(host);
+    if (socket.current) {
+      socket.current.on("onlineUsers", (users) => {
+        setOnlineUsers(users);
+      });
+    }
+  }
+  connectSocket();
+}, []);
+
+
 useEffect(() => {
     async function fetchData() {
         if (!localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)) {
@@ -51,7 +66,7 @@ useEffect(() => {
         }
     }
     fetchContacts();
-}, [currentUser, navigate]);
+}, [currentUser, navigate ,onlineUsers]);
 
   const handleChatChange = (chat) => {
     setCurrentChat(chat);
@@ -61,7 +76,7 @@ useEffect(() => {
     <>
       <Container>
         <div className="container">
-          <Contacts contacts={contacts} changeChat={handleChatChange} socket = {io(host)}/>
+          <Contacts contacts={contacts} changeChat={handleChatChange} socket = {io(host)} onlineUsers={onlineUsers} />
           {currentChat === undefined ? (
             <Welcome />
           ) : (
