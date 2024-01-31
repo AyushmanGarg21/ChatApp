@@ -18,7 +18,7 @@ export default function Chat() {
 
   useEffect(() => {
   function connectSocket() {
-    socket.current = io(host ,{path: "/api/socket.io"});
+    socket.current = io(host ,{path: "/api/socket.io/"});
     if (socket.current) {
       socket.current.on("onlineUsers", (users) => {
         setOnlineUsers(users);
@@ -47,7 +47,7 @@ useEffect(() => {
 useEffect(() => {
     async function connectSocket() {
         if (currentUser) {
-            socket.current = io(host ,{path: "/api/socket.io"});
+            socket.current = io(host ,{path: "/api/socket.io/"});
             socket.current.emit("join", currentUser._id);
         }
     }
